@@ -48,32 +48,44 @@ let computerScore = 0;
 // Input handling
 const keys = {};
 let mouseY = canvas.height / 2;
+let useKeyboardControl = false;
 
 window.addEventListener('keydown', (e) => {
-    keys[e.key] = true;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        keys[e.key] = true;
+        useKeyboardControl = true;
+    }
 });
 
 window.addEventListener('keyup', (e) => {
-    keys[e.key] = false;
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        keys[e.key] = false;
+        useKeyboardControl = false;
+    }
 });
 
 canvas.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mouseY = e.clientY - rect.top;
+    if (!useKeyboardControl) {
+        const rect = canvas.getBoundingClientRect();
+        mouseY = e.clientY - rect.top;
+    }
 });
 
 // Update player paddle position
 function updatePlayerPaddle() {
-    // Mouse control
-    const targetY = mouseY - playerPaddle.height / 2;
-    playerPaddle.y = Math.max(playerPaddle.minY, Math.min(playerPaddle.maxY, targetY));
-
-    // Arrow keys control (override or assist mouse)
-    if (keys['ArrowUp']) {
-        playerPaddle.y = Math.max(playerPaddle.minY, playerPaddle.y - playerPaddle.speed);
-    }
-    if (keys['ArrowDown']) {
-        playerPaddle.y = Math.min(playerPaddle.maxY, playerPaddle.y + playerPaddle.speed);
+    if (useKeyboardControl) {
+        // Keyboard control - smooth continuous movement
+        if (keys['ArrowUp']) {
+            playerPaddle.y = Math.max(playerPaddle.minY, playerPaddle.y - playerPaddle.speed);
+        }
+        if (keys['ArrowDown']) {
+            playerPaddle.y = Math.min(playerPaddle.maxY, playerPaddle.y + playerPaddle.speed);
+        }
+    } else {
+        // Mouse control
+        const targetY = mouseY - playerPaddle.height / 2;
+        playerPaddle.y = Math.max(playerPaddle.minY, Math.min(playerPaddle.maxY, targetY));
     }
 }
 
