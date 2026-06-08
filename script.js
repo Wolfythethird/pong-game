@@ -49,32 +49,49 @@ let computerScore = 0;
 const keys = {};
 let mouseY = canvas.height / 2;
 let useKeyboardControl = false;
+let controlMode = 'mouse'; // 'mouse' or 'keyboard'
 
 window.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
         keys[e.key] = true;
-        useKeyboardControl = true;
+        if (controlMode === 'keyboard') {
+            useKeyboardControl = true;
+        }
     }
 });
 
 window.addEventListener('keyup', (e) => {
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         keys[e.key] = false;
-        useKeyboardControl = false;
+        // Don't reset useKeyboardControl on key release
+        // The paddle will maintain its position
     }
 });
 
 canvas.addEventListener('mousemove', (e) => {
-    if (!useKeyboardControl) {
+    if (controlMode === 'mouse') {
         const rect = canvas.getBoundingClientRect();
         mouseY = e.clientY - rect.top;
     }
 });
 
+// Toggle control mode
+function toggleControlMode() {
+    if (controlMode === 'mouse') {
+        controlMode = 'keyboard';
+        useKeyboardControl = true;
+        document.getElementById('controlModeBtn').textContent = 'Switch to Mouse Mode';
+    } else {
+        controlMode = 'mouse';
+        useKeyboardControl = false;
+        document.getElementById('controlModeBtn').textContent = 'Switch to Keyboard Mode';
+    }
+}
+
 // Update player paddle position
 function updatePlayerPaddle() {
-    if (useKeyboardControl) {
+    if (controlMode === 'keyboard') {
         // Keyboard control - smooth continuous movement
         if (keys['ArrowUp']) {
             playerPaddle.y = Math.max(playerPaddle.minY, playerPaddle.y - playerPaddle.speed);
@@ -82,6 +99,7 @@ function updatePlayerPaddle() {
         if (keys['ArrowDown']) {
             playerPaddle.y = Math.min(playerPaddle.maxY, playerPaddle.y + playerPaddle.speed);
         }
+        // When no keys are pressed, the paddle stays in place
     } else {
         // Mouse control
         const targetY = mouseY - playerPaddle.height / 2;
