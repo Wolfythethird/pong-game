@@ -52,9 +52,10 @@ let useKeyboardControl = false;
 let controlMode = 'mouse'; // 'mouse' or 'keyboard'
 
 window.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+    // Support Arrow Keys and WASD
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key.toLowerCase() === 'w' || e.key.toLowerCase() === 's') {
         e.preventDefault();
-        keys[e.key] = true;
+        keys[e.key.toLowerCase()] = true;
         if (controlMode === 'keyboard') {
             useKeyboardControl = true;
         }
@@ -62,8 +63,9 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('keyup', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        keys[e.key] = false;
+    // Support Arrow Keys and WASD
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key.toLowerCase() === 'w' || e.key.toLowerCase() === 's') {
+        keys[e.key.toLowerCase()] = false;
         // Don't reset useKeyboardControl on key release
         // The paddle will maintain its position
     }
@@ -93,10 +95,11 @@ function toggleControlMode() {
 function updatePlayerPaddle() {
     if (controlMode === 'keyboard') {
         // Keyboard control - smooth continuous movement
-        if (keys['ArrowUp']) {
+        // Support both Arrow Keys and WASD
+        if (keys['arrowup'] || keys['w']) {
             playerPaddle.y = Math.max(playerPaddle.minY, playerPaddle.y - playerPaddle.speed);
         }
-        if (keys['ArrowDown']) {
+        if (keys['arrowdown'] || keys['s']) {
             playerPaddle.y = Math.min(playerPaddle.maxY, playerPaddle.y + playerPaddle.speed);
         }
         // When no keys are pressed, the paddle stays in place
